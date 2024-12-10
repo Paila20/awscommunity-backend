@@ -3,8 +3,8 @@ const { getAllExpenses, addExpense, deleteExpense,updateExpense }
     = require('../Controllers/ExpenseController');
 const router = express.Router();
 
-router.get('/', getAllExpenses);
-router.post('/', addExpense);
+router.get('/get', getAllExpenses);
+router.post('/add', addExpense);
 router.delete('/:expenseId', deleteExpense);
 
 router.put('/:expenseId', updateExpense);
