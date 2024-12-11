@@ -14,7 +14,21 @@ const storage = multer.diskStorage({
         cb(null, Date.now() + '-' + file.originalname);
     },
 });
-const upload = multer({ storage });
+  
+const upload = multer({
+    storage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit
+    fileFilter: (req, file, cb) => {
+        const fileTypes = /jpeg|jpg|png|gif/; // Allowed extensions
+        const extname = fileTypes.test(file.mimetype);
+        if (extname) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only image files are allowed.'));
+        }
+    },
+});
+
 
 // Create Blog
 router.post('/create', ensureAuthenticated, upload.single('image'), async (req, res) => {
@@ -59,7 +73,7 @@ router.put('/:id', ensureAuthenticated, upload.single('image'), async (req, res)
 router.delete('/:id', ensureAuthenticated, async (req, res) => {
     const blog = await Blog.findById(req.params.id);
     if (!blog) return res.status(404).json({ message: 'Blog not found.' });
-    if (blog.userId.toString() !== req.user._Id) return res.status(403).json({ message: 'Unauthorized.' });
+    if (blog.userId.toString() !== req.user._id) return res.status(403).json({ message: 'Unauthorized.' });
 
     await blog.remove();
     res.json({ message: 'Blog deleted successfully' });
