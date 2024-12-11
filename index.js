@@ -16,9 +16,21 @@ const PORT = process.env.PORT || 8080;
 app.get('/ping', (req, res) => {
     res.send('PONG');
 });
-// app.use(express.json());
+
+app.use(express.json({ limit: '10mb' })); // Increase limit for JSON payloads
+app.use(express.urlencoded({ limit: '10mb', extended: true })); // For URL-encoded payloads
+
 app.use(bodyParser.json());
-app.use(cors());
+
+
+const corsOptions = {
+    origin:  ['http://localhost:3000', 'https://your-deployed-frontend.com'],
+    methods: 'GET,PUT,PATCH,POST,DELETE',
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 app.use('/auth', AuthRouter);
 app.use('/products', ProductRouter);
 app.use('/expenses', ensureAuthenticated, ExpenseRouter)
