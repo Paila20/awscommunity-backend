@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 
 
 const corsOptions = {
-    origin:  [ 'https://backend-blog-app-navy.vercel.app/'],
+    origin:  [ 'https://backend-expensetracker.vercel.app/'],
     methods: 'GET,PUT,PATCH,POST,DELETE',
     credentials: true,
 };
