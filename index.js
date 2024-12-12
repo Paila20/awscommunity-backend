@@ -23,13 +23,9 @@ app.use(express.urlencoded({ limit: '10mb', extended: true })); // For URL-encod
 app.use(bodyParser.json());
 
 
-const corsOptions = {
-    origin:  [],
-    methods: 'GET,PUT,PATCH,POST,DELETE',
-    credentials: true,
-};
 
-app.use(cors(corsOptions));
+
+app.use(cors);
 
 app.use('/auth', AuthRouter);
 app.use('/products', ProductRouter);
