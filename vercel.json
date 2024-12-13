@@ -2,19 +2,17 @@
     "version": 2,
 
     "functions":{
-      "index.js":{
-         "memory":1024,
-         "maxDuration":60
-      }
+     
+      "api/*.js": {
+      "runtime": "nodejs",
+       "maxDuration": 60
+    }
     },
    
     "routes": [
       {
         "handle":"filesystem"
-      },
-        {
-            "src": "/(.*)",
-            "dest": "index.js"
-        }
+      }
+       
     ]
 }
