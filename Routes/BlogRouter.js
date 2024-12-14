@@ -157,6 +157,7 @@
 const express = require('express');
 const multer = require('multer');
 const Blog = require('../Models/Blog');
+const User = require('../Models/User'); 
 const ensureAuthenticated = require('../Middlewares/Auth');
 const path = require('path');
 const fs = require('fs');
@@ -200,7 +201,7 @@ router.post('/create', ensureAuthenticated, (req, res, next) => {
 }, async (req, res) => {
     try {
         console.log('Authenticated user:', req.user); // Log user info
-        const { _id } = req.user;
+        const { _id ,name} = req.user;
         const { title, content } = req.body;
         console.log('Request body:', req.body);
         
@@ -212,7 +213,10 @@ router.post('/create', ensureAuthenticated, (req, res, next) => {
 
         // Save the image path (using the uploaded file's name)
         const image = `/uploads/${req.file.filename}`;
-
+        const user = await User.findById(_id);
+        if (!user) {
+            return res.status(400).send({ message: 'User not found' });
+        }
         // Create and save the blog post
         const blog = new Blog({
             title,
@@ -220,6 +224,7 @@ router.post('/create', ensureAuthenticated, (req, res, next) => {
             image,
             date: new Date(),
             userId: _id,
+            userName:user.name,
         });
         console.log('Saving blog:', blog);
         await blog.save();
@@ -227,6 +232,17 @@ router.post('/create', ensureAuthenticated, (req, res, next) => {
         res.status(201).json({ message: 'Blog created successfully', blog });
     } catch (error) {
         console.error('Error in /create route:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+});
+// Fetch all blogs (no user filtering)
+router.get('/all', ensureAuthenticated, async (req, res) => {
+    try {
+        // Get all blogs from the database
+        const blogs = await Blog.find();  // No userId filter here
+        res.json(blogs);  // Send the list of blogs as a response
+    } catch (error) {
+        console.error('Error fetching blogs:', error);
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
