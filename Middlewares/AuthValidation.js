@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,100}$/;
+const passwordRegex =  /^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 const signupValidation = (req, res, next) => {
     const schema = Joi.object({
         name: Joi.string().min(3).max(100).required(),
