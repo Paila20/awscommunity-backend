@@ -16,13 +16,13 @@ const PORT = process.env.PORT || 5000;
 app.get('/ping', (req, res) => {
     res.send('PONG');
 });
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true }); // Ensure that the folder is created
-    console.log('Uploads directory created.');
-} else {
-    console.log('Uploads directory already exists.');
-}
+// const uploadDir = path.join(__dirname, 'uploads');
+// if (!fs.existsSync(uploadDir)) {
+//     fs.mkdirSync(uploadDir, { recursive: true }); // Ensure that the folder is created
+//     console.log('Uploads directory created.');
+// } else {
+//     console.log('Uploads directory already exists.');
+// }
 
 
 app.use(express.json());
@@ -40,7 +40,7 @@ app.use(cors({
 app.use('/auth', AuthRouter);
 app.use('/products', ProductRouter);
 
-app.use('/uploads', express.static(uploadDir)); 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
 app.use('/api/blogs', blogRoutes);
 
 app.listen(PORT, () => {

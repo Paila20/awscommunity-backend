@@ -166,7 +166,7 @@ const router = express.Router();
 // Multer Setup for Image Upload
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null,  path.join(__dirname, 'uploads')); // Specify the folder to store uploaded files
+        cb(null,  'uploads/'); // Specify the folder to store uploaded files
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + '-' + file.originalname); // Set the file name as the timestamp + original name
