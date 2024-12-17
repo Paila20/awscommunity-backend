@@ -34,7 +34,7 @@ app.use(cors({
 app.use('/auth', AuthRouter);
 app.use('/products', ProductRouter);
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
 app.use('/api/blogs', blogRoutes);
 
 app.listen(PORT, () => {
