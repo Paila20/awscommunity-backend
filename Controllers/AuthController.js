@@ -77,13 +77,16 @@ const User = require("../Models/User");
 
 const signup = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password,role } = req.body;
+        if (!name || !email || !password || !role) {
+            return res.status(400).json({ message: 'All fields are required.' });
+        }
         const user = await User.findOne({ email });
         if (user) {
             return res.status(409)
                 .json({ message: 'User already exists, you can login', success: false });
         }
-        const userModel = new User({ name, email, password });
+        const userModel = new User({ name, email, password, role });
         userModel.password = await bcrypt.hash(password, 10);
         await userModel.save();
 
@@ -117,7 +120,7 @@ const login = async (req, res) => {
                 .json({ message: errorMsg, success: false });
         }
         const jwtToken = jwt.sign(
-            { email: user.email, _id: user._id },
+            { email: user.email, _id: user._id ,role: user.role},
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
@@ -127,7 +130,8 @@ const login = async (req, res) => {
             success: true,
             jwtToken,
             email,
-            name: user.name
+            name: user.name,
+            role: user.role 
         };
         console.log("Login Response:", response); // Log the response
         res.status(200).json(response);

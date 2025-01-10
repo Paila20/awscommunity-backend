@@ -5,7 +5,8 @@ const signupValidation = (req, res, next) => {
     const schema = Joi.object({
         name: Joi.string().min(3).max(100).required(),
         email: Joi.string().email().pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/).required(),
-        password: Joi.string().min(8).pattern(passwordRegex).required()
+        password: Joi.string().min(8).pattern(passwordRegex).required(),
+        role: Joi.string().valid('Admin', 'Editor').required(),
     });
     const { error } = schema.validate(req.body);
     if (error) {
