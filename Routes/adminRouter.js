@@ -5,7 +5,7 @@ const router = express.Router();
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { v2: cloudinary } = require('cloudinary');
-const Blog = require('../Models/Blog');
+// const Blog = require('../Models/Blog');
 const User = require('../Models/User');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
@@ -23,7 +23,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: 'blogs', // Cloudinary folder to store images
+        folder: 'team', // Cloudinary folder to store images
         allowed_formats: ['jpg', 'jpeg', 'png', 'gif'], // Allowed file formats
     },
 });
@@ -41,7 +41,7 @@ router.post('/users', ensureAuthenticated,isAdmin, async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
 
-        if (!['Admin', 'Editor'].includes(role)) {
+        if (!['admin', 'user'].includes(role)) {
             return res.status(400).json({ message: 'Invalid role.' });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -54,6 +54,35 @@ router.post('/users', ensureAuthenticated,isAdmin, async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
+
+// 2. Admin: Update a User
+router.put('/users/:id', ensureAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, email, password, role } = req.body;
+
+        // Check if the user exists
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        // Only update fields that are provided in the request
+        if (name) user.name = name;
+        if (email) user.email = email;
+        if (password) user.password = await bcrypt.hash(password, 10);
+        if (role && ['admin', 'user'].includes(role)) {
+            user.role = role;
+        }
+
+        await user.save();
+        res.status(200).json({ message: 'User updated successfully.', user });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+});
+
 
 // 2. Admin: Delete a User
 router.delete('/users/:id', ensureAuthenticated,isAdmin,async (req, res) => {
@@ -75,7 +104,7 @@ router.delete('/users/:id', ensureAuthenticated,isAdmin,async (req, res) => {
 // 3. Admin: Fetch List of Users
 router.get('/users', ensureAuthenticated,isAdmin, async (req, res) => {
     try {
-        const users = await User.find({ role: 'Editor' });
+        const users = await User.find({ role: 'user' });
         res.json(users);
     } catch (error) {
         console.error('Error fetching users:', error);
@@ -83,126 +112,126 @@ router.get('/users', ensureAuthenticated,isAdmin, async (req, res) => {
     }
 });
 
-router.get('/blogs/draft', ensureAuthenticated, isAdmin, async (req, res) => {
-    try {
+// router.get('/blogs/draft', ensureAuthenticated, isAdmin, async (req, res) => {
+//     try {
 
-        const user = await User.findById(req.user._id);
+//         const user = await User.findById(req.user._id);
 
-        if (!user || user.role !== 'Admin') {
-            return res.status(403).json({ message: 'Forbidden: Only Admin can access this route.' });
-        }
+//         if (!user || user.role !== 'Admin') {
+//             return res.status(403).json({ message: 'Forbidden: Only Admin can access this route.' });
+//         }
 
        
-        const draftBlogs = await Blog.find({
-            status: 'draft',
-            userId: req.user._id, 
-        });
+//         const draftBlogs = await Blog.find({
+//             status: 'draft',
+//             userId: req.user._id, 
+//         });
 
-        res.json(draftBlogs);
+//         res.json(draftBlogs);
      
        
-    } catch (error) {
-        console.error('Error fetching published blogs:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }
-});
+//     } catch (error) {
+//         console.error('Error fetching published blogs:', error);
+//         res.status(500).json({ message: 'Internal Server Error', error: error.message });
+//     }
+// });
 
-// 5. Admin: Create a Blog with Cloudinary Upload
-router.post('/blogs', ensureAuthenticated,isAdmin, upload.single('image'), async (req, res) => {
-    try {
-        const { title, content} = req.body;
+// // 5. Admin: Create a Blog with Cloudinary Upload
+// router.post('/blogs', ensureAuthenticated,isAdmin, upload.single('image'), async (req, res) => {
+//     try {
+//         const { title, content} = req.body;
         
 
-       const{_id} = req.user;
-       console.log(_id)
-        const user = await User.findById(_id);
-        if (!user) {
-            return res.status(400).send({ message: 'User not found' });
-        }
+//        const{_id} = req.user;
+//        console.log(_id)
+//         const user = await User.findById(_id);
+//         if (!user) {
+//             return res.status(400).send({ message: 'User not found' });
+//         }
 
-        const blog = new Blog({
-            title,
-            content,
-            image:req.file.path, 
-            userId: _id,
-            userName: user.name,
-        });
+//         const blog = new Blog({
+//             title,
+//             content,
+//             image:req.file.path, 
+//             userId: _id,
+//             userName: user.name,
+//         });
 
-        await blog.save();
-        res.status(201).json({ message: 'Blog created successfully.', blog });
-    } catch (error) {
-        console.error('Error creating blog:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }
-});
+//         await blog.save();
+//         res.status(201).json({ message: 'Blog created successfully.', blog });
+//     } catch (error) {
+//         console.error('Error creating blog:', error);
+//         res.status(500).json({ message: 'Internal Server Error', error: error.message });
+//     }
+// });
 
-// 6. Admin: Update a Blog with Cloudinary Upload
-router.put('/blogs/:id', ensureAuthenticated,isAdmin, upload.single('image'), async (req, res) => {
-    try {
-        const { title, content } = req.body;
+// // 6. Admin: Update a Blog with Cloudinary Upload
+// router.put('/blogs/:id', ensureAuthenticated,isAdmin, upload.single('image'), async (req, res) => {
+//     try {
+//         const { title, content } = req.body;
 
-        const blog = await Blog.findById(req.params.id);
+//         const blog = await Blog.findById(req.params.id);
 
-        if (!blog) {
-            return res.status(404).json({ message: 'Blog not found.' });
-        }
+//         if (!blog) {
+//             return res.status(404).json({ message: 'Blog not found.' });
+//         }
 
-        blog.title = title || blog.title;
-        blog.content = content || blog.content;
+//         blog.title = title || blog.title;
+//         blog.content = content || blog.content;
 
-        if (req.file) {
-            blog.image = req.file.path; // Update Cloudinary URL
-        }
+//         if (req.file) {
+//             blog.image = req.file.path; // Update Cloudinary URL
+//         }
 
-        await blog.save();
-        res.json({ message: 'Blog updated successfully.', blog });
-    } catch (error) {
-        console.error('Error updating blog:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }
-});
+//         await blog.save();
+//         res.json({ message: 'Blog updated successfully.', blog });
+//     } catch (error) {
+//         console.error('Error updating blog:', error);
+//         res.status(500).json({ message: 'Internal Server Error', error: error.message });
+//     }
+// });
 
-// 7. Admin: Delete a Blog
-router.delete('/blogs/:id', ensureAuthenticated,isAdmin, async (req, res) => {
-    try {
-        const blog = await Blog.findById(req.params.id);
+// // 7. Admin: Delete a Blog
+// router.delete('/blogs/:id', ensureAuthenticated,isAdmin, async (req, res) => {
+//     try {
+//         const blog = await Blog.findById(req.params.id);
 
-        if (!blog) {
-            return res.status(404).json({ message: 'Blog not found.' });
-        }
+//         if (!blog) {
+//             return res.status(404).json({ message: 'Blog not found.' });
+//         }
 
-        await blog.deleteOne();
-        res.json({ message: 'Blog deleted successfully.' });
-    } catch (error) {
-        console.error('Error deleting blog:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }
-});
+//         await blog.deleteOne();
+//         res.json({ message: 'Blog deleted successfully.' });
+//     } catch (error) {
+//         console.error('Error deleting blog:', error);
+//         res.status(500).json({ message: 'Internal Server Error', error: error.message });
+//     }
+// });
 
-// 8. Admin: Update Blog Status
-router.patch('/blogs/:id/status',ensureAuthenticated, isAdmin, async (req, res) => {
-    try {
-        const { status } = req.body;
+// // 8. Admin: Update Blog Status
+// router.patch('/blogs/:id/status',ensureAuthenticated, isAdmin, async (req, res) => {
+//     try {
+//         const { status } = req.body;
 
-        if (!['draft', 'published'].includes(status)) {
-            return res.status(400).json({ message: 'Invalid status.' });
-        }
+//         if (!['draft', 'published'].includes(status)) {
+//             return res.status(400).json({ message: 'Invalid status.' });
+//         }
 
-        const blog = await Blog.findById(req.params.id);
+//         const blog = await Blog.findById(req.params.id);
 
-        if (!blog) {
-            return res.status(404).json({ message: 'Blog not found.' });
-        }
+//         if (!blog) {
+//             return res.status(404).json({ message: 'Blog not found.' });
+//         }
 
-        blog.status = status;
-        await blog.save();
+//         blog.status = status;
+//         await blog.save();
 
-        res.json({ message: `Blog status updated to ${status}.`, blog });
-    } catch (error) {
-        console.error('Error updating blog status:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }
-});
+//         res.json({ message: `Blog status updated to ${status}.`, blog });
+//     } catch (error) {
+//         console.error('Error updating blog status:', error);
+//         res.status(500).json({ message: 'Internal Server Error', error: error.message });
+//     }
+// });
 
 
 module.exports = router;
