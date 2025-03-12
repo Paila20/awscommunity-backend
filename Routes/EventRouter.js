@@ -23,11 +23,11 @@ const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 // ✅ Create Event (Admin Only)
 router.post("/events", upload.single("image"), async (req, res) => {
   try {
-    const { title, category } = req.body;
+    const { title, description, category } = req.body;
     // const image = req.file.path; 
     const image = req.file ? req.file.path : null;
 
-    const newEvent = new Event({ title, category, image });
+    const newEvent = new Event({ title, description, category, image });
     await newEvent.save();
 
     res.status(201).json({ message: "Event created successfully", event: newEvent });
@@ -61,8 +61,8 @@ router.get("/events/:id", async (req, res) => {
 // ✅ Update Event (Admin Only)
 router.put("/events/:id", upload.single("image"), async (req, res) => {
   try {
-    const { title, category } = req.body;
-    let updatedData = { title, category };
+    const { title,description, category } = req.body;
+    let updatedData = { title, description, category };
 
     if (req.file) {
       updatedData.image = req.file.path; // Cloudinary URL
