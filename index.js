@@ -10,6 +10,7 @@ const teamRoutes = require('./Routes/TeamRouter');
 const joinusRoutes = require('./Routes/JoinUsRouter');
 const eventRoutes = require('./Routes/EventRouter');
 const sectionRoutes = require('./Routes/SectionRouter');
+const pageRoutes = require('./Routes/PageRouter');
 
 
 
@@ -44,6 +45,7 @@ app.use('/api',teamRoutes);
 
 app.use('/api',eventRoutes);
 app.use('/api',sectionRoutes);
+app.use('/api',pageRoutes);
 
 
 app.listen(PORT, () => {
