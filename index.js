@@ -7,7 +7,7 @@ const AuthRouter = require('./Routes/AuthRouter');
 const adminRoutes = require('./Routes/adminRouter');
 
 const teamRoutes = require('./Routes/TeamRouter');
-const joinusRoutes = require('./Routes/JoinUsRouter');
+
 const eventRoutes = require('./Routes/EventRouter');
 const sectionRoutes = require('./Routes/SectionRouter');
 const pageRoutes = require('./Routes/PageRouter');

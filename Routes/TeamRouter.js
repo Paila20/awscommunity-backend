@@ -30,7 +30,7 @@ const upload = multer({
 
 
 
-router.post("/team", ensureAuthenticated, isAdmin, upload.single("image"), async (req, res) => {
+router.post("/team",  upload.single("image"), async (req, res) => {
   try {
     const { name, designation, role } = req.body;
     const image = req.file ? req.file.path : null;
@@ -72,7 +72,7 @@ router.get("/team", async (req, res) => {
 // });
 
 // Update Team Member (Admin Only)
-router.put("/team/:id", ensureAuthenticated, isAdmin, upload.single("image"), async (req, res) => {
+router.put("/team/:id",  upload.single("image"), async (req, res) => {
   try {
     const { name, designation, role } = req.body;
     let updateData = { name, designation, role };
@@ -94,7 +94,7 @@ router.put("/team/:id", ensureAuthenticated, isAdmin, upload.single("image"), as
 });
 
 //  Delete Team Member (Admin Only)
-router.delete("/team/:id", ensureAuthenticated, isAdmin, async (req, res) => {
+router.delete("/team/:id",  async (req, res) => {
   try {
     const deletedMember = await Team.findByIdAndDelete(req.params.id);
     if (!deletedMember) {

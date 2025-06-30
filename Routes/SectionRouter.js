@@ -3,7 +3,7 @@ const router = express.Router();
 const Section = require("../Models/Section");
 const { ensureAuthenticated, isAdmin } = require("../Middlewares/Auth");
 // Create Section
-router.post("/sections", ensureAuthenticated,isAdmin, async (req, res) => {
+router.post("/sections", async (req, res) => {
   try {
     const section = new Section(req.body);
     await section.save();
@@ -35,7 +35,7 @@ router.get("/sections", async (req, res) => {
 // });
 
 // Get Section by ID or Menu
-router.get("/sections/:param",ensureAuthenticated,isAdmin,  async (req, res) => {
+router.get("/sections/:param",  async (req, res) => {
     try {
       let section;
       // Check if the param is a valid MongoDB ObjectId
@@ -54,7 +54,7 @@ router.get("/sections/:param",ensureAuthenticated,isAdmin,  async (req, res) => 
   
 
 // Update Section
-router.put("/sections/:id", ensureAuthenticated,isAdmin, async (req, res) => {
+router.put("/sections/:id",  async (req, res) => {
   try {
     const section = await Section.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!section) return res.status(404).json({ error: "Section not found" });
@@ -65,7 +65,7 @@ router.put("/sections/:id", ensureAuthenticated,isAdmin, async (req, res) => {
 });
 
 // Delete Section
-router.delete("/sections/:id", ensureAuthenticated,isAdmin, async (req, res) => {
+router.delete("/sections/:id", async (req, res) => {
   try {
     const section = await Section.findByIdAndDelete(req.params.id);
     if (!section) return res.status(404).json({ error: "Section not found" });
