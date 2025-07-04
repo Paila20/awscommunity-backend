@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const JoinRequest = require("../Models/JoinRequest");
-const { sendConfirmationEmail } = require("../utils/mailer");
+// const { sendConfirmationEmail } = require("../utils/mailer");
 // const { ensureAuthenticated, isAdmin } = require("../middleware/auth"); 
 
 // POST /api/join-us
@@ -11,7 +11,7 @@ router.post("/join-us", async (req, res) => {
     await newRequest.save();
 
     // Send email
-    await sendConfirmationEmail(req.body.email, req.body.name);
+    // await sendConfirmationEmail(req.body.email, req.body.name);
 
     res.status(201).json({ message: "Form submitted and confirmation email sent!" });
   } catch (err) {
